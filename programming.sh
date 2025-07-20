@@ -780,6 +780,191 @@ Accept: text/html"
 
 echo -e "\n=== Embedded Systems Programming ==="
 
+#!/bin/bash
+
+# Embedded System Resource Management Scripts
+# Simulating resource-constrained environment operations
+
+echo "=== Embedded System Resource Monitor ==="
+
+# 1. Memory Management - Check available RAM
+check_memory() {
+    echo "--- Memory Status ---"
+    # Get memory info (embedded systems often have very limited RAM)
+    total_mem=$(cat /proc/meminfo | grep MemTotal | awk '{print $2}')
+    avail_mem=$(cat /proc/meminfo | grep MemAvailable | awk '{print $2}')
+    
+    # Convert to MB for readability
+    total_mb=$((total_mem / 1024))
+    avail_mb=$((avail_mem / 1024))
+    used_mb=$((total_mb - avail_mb))
+    
+    echo "Total RAM: ${total_mb}MB"
+    echo "Used RAM: ${used_mb}MB" 
+    echo "Available RAM: ${avail_mb}MB"
+    
+    # Alert if memory usage is high (critical for embedded systems)
+    usage_percent=$((used_mb * 100 / total_mb))
+    if [ $usage_percent -gt 80 ]; then
+        echo "WARNING: High memory usage (${usage_percent}%)"
+    fi
+}
+
+# 2. Storage Management - Monitor flash/disk usage
+check_storage() {
+    echo "--- Storage Status ---"
+    # Check root filesystem (represents flash storage)
+    df -h / | tail -1 | while read fs size used avail percent mount; do
+        echo "Storage: $size total, $used used, $avail available ($percent full)"
+        
+        # Extract percentage number
+        percent_num=$(echo $percent | sed 's/%//')
+        if [ $percent_num -gt 85 ]; then
+            echo "WARNING: Storage nearly full ($percent)"
+        fi
+    done
+}
+
+# 3. CPU Usage Monitoring
+check_cpu() {
+    echo "--- CPU Status ---"
+    # Get CPU load average
+    load=$(uptime | awk -F'load average:' '{print $2}' | cut -d',' -f1 | xargs)
+    echo "CPU Load Average (1min): $load"
+    
+    # Simple CPU usage check
+    cpu_usage=$(top -bn1 | grep "Cpu(s)" | awk '{print $2}' | sed 's/%us,//')
+    echo "CPU Usage: ${cpu_usage}%"
+}
+
+# 4. Process Management - List critical processes
+monitor_processes() {
+    echo "--- Critical Processes ---"
+    # Show only essential processes (embedded systems run minimal processes)
+    ps aux --sort=-%mem | head -5 | while read user pid cpu mem vsz rss tty stat start time command; do
+        if [ "$user" != "USER" ]; then  # Skip header
+            echo "PID: $pid, CPU: $cpu%, MEM: $mem%, CMD: $command"
+        fi
+    done
+}
+
+# 5. Temperature Monitoring (critical for embedded systems)
+check_temperature() {
+    echo "--- Temperature Status ---"
+    # Check if thermal info is available
+    if [ -f /sys/class/thermal/thermal_zone0/temp ]; then
+        temp_raw=$(cat /sys/class/thermal/thermal_zone0/temp)
+        temp_celsius=$((temp_raw / 1000))
+        echo "CPU Temperature: ${temp_celsius}°C"
+        
+        # Alert for high temperature
+        if [ $temp_celsius -gt 70 ]; then
+            echo "WARNING: High temperature detected!"
+        fi
+    else
+        echo "Temperature monitoring not available"
+    fi
+}
+
+# 6. Power Management Simulation
+power_management() {
+    echo "--- Power Management ---"
+    
+    # Simulate battery level check
+    battery_level=$((50 + RANDOM % 50))  # Random level between 50-100%
+    echo "Battery Level: ${battery_level}%"
+    
+    # Power saving mode trigger
+    if [ $battery_level -lt 20 ]; then
+        echo "ALERT: Low battery - entering power saving mode"
+        echo "- Reducing CPU frequency"
+        echo "- Disabling non-essential peripherals"
+        echo "- Increasing sleep intervals"
+    fi
+}
+
+# 7. Log Management (space-conscious for embedded systems)
+manage_logs() {
+    echo "--- Log Management ---"
+    
+    # Create sample log directory
+    LOG_DIR="/tmp/embedded_logs"
+    mkdir -p $LOG_DIR
+    
+    # Simulate log rotation to save space
+    max_log_size=1024  # 1KB max for demonstration
+    
+    for logfile in sensor.log system.log error.log; do
+        log_path="$LOG_DIR/$logfile"
+        
+        # Create dummy log if it doesn't exist
+        if [ ! -f "$log_path" ]; then
+            echo "$(date): Sample log entry" > "$log_path"
+        fi
+        
+        # Check log size
+        if [ -f "$log_path" ]; then
+            size=$(stat -f%z "$log_path" 2>/dev/null || stat -c%s "$log_path" 2>/dev/null)
+            echo "Log $logfile: ${size} bytes"
+            
+            # Rotate if too large
+            if [ $size -gt $max_log_size ]; then
+                echo "Rotating $logfile (size limit exceeded)"
+                mv "$log_path" "${log_path}.old"
+                touch "$log_path"
+            fi
+        fi
+    done
+}
+
+# 8. Watchdog Timer Simulation
+watchdog_check() {
+    echo "--- Watchdog Status ---"
+    
+    # Simulate watchdog timer check
+    last_heartbeat=$(date +%s)
+    current_time=$(date +%s)
+    
+    echo "Last heartbeat: $(date -d @$last_heartbeat)"
+    echo "Watchdog timer: Active"
+    echo "System health: OK"
+    
+    # In real embedded system, this would reset the hardware watchdog
+    echo "Watchdog timer reset"
+}
+
+# Main execution
+main() {
+    echo "Starting embedded system health check..."
+    echo "Timestamp: $(date)"
+    echo "============================================"
+    
+    check_memory
+    echo
+    check_storage  
+    echo
+    check_cpu
+    echo
+    monitor_processes
+    echo
+    check_temperature
+    echo
+    power_management
+    echo
+    manage_logs
+    echo
+    watchdog_check
+    
+    echo "============================================"
+    echo "Health check complete"
+    
+    # Cleanup
+    rm -rf /tmp/embedded_logs
+}
+
+# Run the main function
+main
+
 # -----------------------------------------------------------------------------
 # Memory Management for Resource-Constrained Systems
 # -----------------------------------------------------------------------------
