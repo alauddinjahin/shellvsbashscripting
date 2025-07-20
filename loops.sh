@@ -731,8 +731,348 @@
 # done
 
 # Nested for loops
-for i in {1..3}; do
-    for j in {1..3}; do
-        echo "$i x $j = $((i * j))"
-    done
-done
+# for i in {1..3}; do
+#     for j in {1..3}; do
+#         echo "$i x $j = $((i * j))"
+#     done
+# done
+
+# Process CSV-like data
+# data="John,25,Engineer Mary,30,Doctor Bob,35,Teacher"
+
+# IFS=" " read -ra entries <<< $data
+# # IFS=', ' read -ra entries <<< "$data"
+# # IFS=", " read -ra entries <<< $data
+
+# # echo "${entries[@]}"
+
+# for entry in "${entries[@]}"; do
+#     IFS=',' read -ra person <<< "$entry"
+#     echo ${person[@]}
+# done
+
+
+# Reading user input
+# while true; do
+#     read -p "Enter command (quit to exit): " cmd
+#     if [ "$cmd" = "quit" ]; then
+#         break
+#     fi
+#     echo "You entered: $cmd"
+# done
+
+# while IFS= read -r line; do 
+#     echo "${line//hello/}" # remove all hello from every single line 
+#     # echo "${line#hello}" # remove hello for the first line 
+# done < "input.txt"
+
+# echo "${line#hello[[:space:]]*}"
+
+# Key Points:
+# # removes from the beginning
+# % would remove from the end
+# // replaces all occurrences
+# [[:space:]] matches any whitespace character
+
+# ps aux
+# ps: Process status command
+# Flags:
+# a: Show processes for all users
+# u: Display user-oriented format
+# x: Include processes without a controlling terminal
+
+
+
+
+# Second part ($(echo "$cpu > 50.0" | bc -l)):
+# Uses bc (basic calculator) to compare CPU usage
+# echo "$cpu > 50.0" sends the comparison to bc
+# -l flag loads math library for floating point operations
+# (( )) evaluates the arithmetic result (1=true, 0=false)
+
+# ps aux | while read user pid cpu mem vsz rss tty stat start time command; do
+#     # if [ "$cpu" != "CPU" ] && (( $(echo "$cpu > 50.0" | bc -l) )); then
+#     #     echo "High CPU process: $command ($cpu%)"
+#     # fi
+# done
+
+
+
+# Menu system
+
+# echo "=== Main Menu ==="
+# echo "1. List files"
+# echo "2. Show date"
+# echo "3. Show users"
+# echo "4. Exit"
+
+# while true; do
+#     read -p "Select option: " option
+
+#     case $option in
+#     1) ls -la ;;
+#     2) date +"%Y-%m-%d" ;;
+#     3) whoami ;;
+#     4) echo "Good bye"; break;;
+#     *) echo "Invalid option" ;;
+#     esac
+
+# done 
+
+
+# Password validation
+# while true; do
+#     read -s -p "Enter password: " password
+#     echo
+    
+#     if [ ${#password} -lt 8 ]; then
+#         echo "Password must be at least 8 characters"
+#         continue
+#     fi
+    
+#     if [[ ! "$password" =~ [A-Z] ]]; then
+#         echo "Password must contain uppercase letter"
+#         continue
+#     fi
+    
+#     if [[ ! "$password" =~ [0-9] ]]; then
+#         echo "Password must contain a number"
+#         continue
+#     fi
+    
+#     echo "Password accepted"
+#     break
+# done
+
+
+# Basic syntax - runs until condition becomes true
+# -r	Raw input (don't interpret backslashes)
+# -s	Silent (for passwords)
+# -t N	Timeout after N seconds
+# -n N	Read exactly N characters
+# -a array	Store results in an array
+
+# printf "Enter number: "
+# read input
+
+# until [ ${#input} -gt 2 ]; do
+#     echo "continuing... ${#input}"
+# done
+
+
+# Wait for network connectivity
+# until ping -c 1 google.com &> /dev/null; do
+#     echo "No internet connection. Retrying in 5 seconds..."
+#     sleep 5
+# done
+# echo "Internet connection established"
+
+
+
+
+
+
+
+# -------------------------------------------------------------------------------------------------------------
+# Feature	                df /	                            df
+# Scope	            Only root filesystem	        All mounted filesystems
+# Use case	        Checking root disk space	    System-wide disk analysis
+# Output lines	    1 (plus header)	                1 per mounted filesystem
+
+# Common Useful Flags:
+# -h  (Human-readable: shows GB/MB)
+# -T (Show filesystem type)
+# --total (Add summary line)
+
+
+# Wait for user confirmation
+# until [ "$response" = "yes" ]; do
+#     read -p "Are you ready to proceed? (yes/no): " response
+#     if [ "$response" = "no" ]; then
+#         echo "Operation cancelled"
+#         exit 1
+#     elif [ "$response" != "yes" ]; then
+#         echo "Please enter 'yes' or 'no'"
+#     fi
+# done
+
+# echo "Proceeding with operation..."
+
+
+
+# Validation loop with continue
+# while IFS= read -r email; do
+#     if [[ ! "$email" =~ ^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$ ]]; then
+#         echo "Invalid email: $email"
+#         continue
+#     fi
+#     echo "Valid email: $email"
+#     # Process valid email
+# done < "email_list.txt"
+
+
+# Log rotation
+# log_dir="/var/log/myapp"
+# max_size=100000000  # 100MB
+
+# for logfile in "$log_dir"/*.log; do
+#     if [ -f "$logfile" ]; then
+#         size=$(stat -f%z "$logfile" 2>/dev/null || stat -c%s "$logfile")
+#         if [ "$size" -gt "$max_size" ]; then
+#             echo "Rotating large log file: $logfile"
+#             mv "$logfile" "$logfile.$(date +%Y%m%d)"
+#             touch "$logfile"
+#         fi
+#     fi
+# done
+
+
+# stat gets file size in bytes with two different syntaxes:
+# -f%z: BSD/macOS format (Darwin systems)
+# -c%s: GNU/Linux format
+
+
+# Command processing script
+# if [ $# -eq 0 ]; then
+#     echo "Usage: $0 <command> [arguments]" # $0 will add the command 
+#     echo "Commands: install, remove, update, status, help"
+#     exit 1
+# fi
+
+
+
+
+
+# command=$1
+# shift  # Remove first argument
+
+# case $command in
+#     "install"|"i")
+#         echo "Installing package(s): $*"
+#         for package in "$@"; do
+#             echo "  Installing $package..."
+#             # apt install $package -y
+#         done
+#         ;;
+#     "remove"|"uninstall"|"r")
+#         echo "Removing package(s): $*"
+#         for package in "$@"; do
+#             echo "  Removing $package..."
+#             # apt remove $package -y
+#         done
+#         ;;
+#     "update"|"u")
+#         echo "Updating package list..."
+#         # apt update
+#         if [ $# -gt 0 ]; then
+#             echo "Upgrading packages: $*"
+#         else
+#             echo "Upgrading all packages..."
+#         fi
+#         ;;
+#     "status"|"s")
+#         if [ $# -gt 0 ]; then
+#             for package in "$@"; do
+#                 echo "Status of $package:"
+#                 # dpkg -l | grep $package
+#             done
+#         else
+#             echo "System status:"
+#             # apt list --upgradable
+#         fi
+#         ;;
+#     "help"|"h"|"--help")
+#         echo "Package Manager Help"
+#         echo "Commands:"
+#         echo "  install|i <packages>  - Install packages"
+#         echo "  remove|r <packages>   - Remove packages"
+#         echo "  update|u [packages]   - Update system or specific packages"
+#         echo "  status|s [packages]   - Show status"
+#         echo "  help|h               - Show this help"
+#         ;;
+#     *)
+#         echo "Error: Unknown command '$command'"
+#         echo "Use '$0 help' for available commands"
+#         exit 1
+#         ;;
+# esac
+
+
+#!/bin/bash
+# Advanced pattern matching
+
+read -p "Enter a filename or URL: " input
+
+case $input in
+    *.txt|*.log|*.md)
+        echo "Text-based file"
+        if [ -f "$input" ]; then
+            echo "File exists. Line count: $(wc -l < "$input")"
+        fi
+        ;;
+    *.jpg|*.jpeg|*.png|*.gif|*.bmp)
+        echo "Image file"
+        if [ -f "$input" ]; then
+            echo "File size: $(du -h "$input" | cut -f1)"
+        fi
+        ;;
+    http://*|https://*)
+        echo "Web URL detected"
+        case $input in
+            *github.com*)
+                echo "GitHub repository"
+                ;;
+            *stackoverflow.com*)
+                echo "Stack Overflow question"
+                ;;
+            *youtube.com*|*youtu.be*)
+                echo "YouTube video"
+                ;;
+            *.pdf)
+                echo "PDF document online"
+                ;;
+            *)
+                echo "Generic web URL"
+                ;;
+        esac
+        ;;
+    [0-9]*)
+        echo "Starts with a number"
+        case $input in
+            [0-9][0-9][0-9]-[0-9][0-9][0-9]-[0-9][0-9][0-9][0-9])
+                echo "Looks like a phone number (XXX-XXX-XXXX)"
+                ;;
+            [0-9][0-9][0-9][0-9])
+                echo "Looks like a year"
+                ;;
+            *)
+                echo "Number-like input"
+                ;;
+        esac
+        ;;
+    [A-Z]*)
+        echo "Starts with uppercase letter"
+        ;;
+    [a-z]*)
+        echo "Starts with lowercase letter"
+        ;;
+    /*)
+        echo "Absolute path"
+        if [ -d "$input" ]; then
+            echo "Directory exists"
+        elif [ -f "$input" ]; then
+            echo "File exists"
+        else
+            echo "Path does not exist"
+        fi
+        ;;
+    ./*)
+        echo "Relative path from current directory"
+        ;;
+    "")
+        echo "Empty input"
+        ;;
+    *)
+        echo "Unknown pattern"
+        ;;
+esac

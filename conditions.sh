@@ -466,6 +466,123 @@ fi
 
 
 
+# Process files based on extension
+
+for file in *; do
+    if [ -f "$file" ]; then
+        extension="${file##*.}"
+        filename="${file%.*}"
+        
+        case $extension in
+            "txt"|"log")
+                echo "Text file: $file"
+                wc -l "$file"
+                ;;
+            "jpg"|"jpeg"|"png"|"gif")
+                echo "Image file: $file"
+                ls -lh "$file"
+                ;;
+            "sh")
+                echo "Shell script: $file"
+                if [ -x "$file" ]; then
+                    echo "  Executable: Yes"
+                else
+                    echo "  Executable: No"
+                fi
+                ;;
+            "pdf"|"doc"|"docx")
+                echo "Document: $file"
+                ;;
+            "zip"|"tar"|"gz"|"rar")
+                echo "Archive: $file"
+                ;;
+            *)
+                echo "Unknown file type: $file"
+                ;;
+        esac
+    fi
+done
+
+
+# Advanced pattern matching
+
+read -p "Enter a filename or URL: " input
+
+case $input in
+    *.txt|*.log|*.md)
+        echo "Text-based file"
+        if [ -f "$input" ]; then
+            echo "File exists. Line count: $(wc -l < "$input")"
+        fi
+        ;;
+    *.jpg|*.jpeg|*.png|*.gif|*.bmp)
+        echo "Image file"
+        if [ -f "$input" ]; then
+            echo "File size: $(du -h "$input" | cut -f1)"
+        fi
+        ;;
+    http://*|https://*)
+        echo "Web URL detected"
+        case $input in
+            *github.com*)
+                echo "GitHub repository"
+                ;;
+            *stackoverflow.com*)
+                echo "Stack Overflow question"
+                ;;
+            *youtube.com*|*youtu.be*)
+                echo "YouTube video"
+                ;;
+            *.pdf)
+                echo "PDF document online"
+                ;;
+            *)
+                echo "Generic web URL"
+                ;;
+        esac
+        ;;
+    [0-9]*)
+        echo "Starts with a number"
+        case $input in
+            [0-9][0-9][0-9]-[0-9][0-9][0-9]-[0-9][0-9][0-9][0-9])
+                echo "Looks like a phone number (XXX-XXX-XXXX)"
+                ;;
+            [0-9][0-9][0-9][0-9])
+                echo "Looks like a year"
+                ;;
+            *)
+                echo "Number-like input"
+                ;;
+        esac
+        ;;
+    [A-Z]*)
+        echo "Starts with uppercase letter"
+        ;;
+    [a-z]*)
+        echo "Starts with lowercase letter"
+        ;;
+    /*)
+        echo "Absolute path"
+        if [ -d "$input" ]; then
+            echo "Directory exists"
+        elif [ -f "$input" ]; then
+            echo "File exists"
+        else
+            echo "Path does not exist"
+        fi
+        ;;
+    ./*)
+        echo "Relative path from current directory"
+        ;;
+    "")
+        echo "Empty input"
+        ;;
+    *)
+        echo "Unknown pattern"
+        ;;
+esac
+
+
 
 
 
