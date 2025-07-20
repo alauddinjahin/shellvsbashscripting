@@ -26,6 +26,7 @@ allocate_memory() {
     
     # Align request size
     local aligned_size=$(( (request_size + alignment - 1) & ~(alignment - 1) ))
+    # ~ is a bitwise NOT, and in this case, it helps create a mask for rounding up to the nearest alignment boundary.
     
     if [ $((pool_used + aligned_size)) -gt $pool_size ]; then
         echo "ERROR: Out of memory (requested: $aligned_size, available: $((pool_size - pool_used)))"
