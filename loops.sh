@@ -729,3 +729,10 @@
 #     value=${entry#*:} #remove prefix, output -> Alice
 #     echo "$key = $value"
 # done
+
+# Nested for loops
+for i in {1..3}; do
+    for j in {1..3}; do
+        echo "$i x $j = $((i * j))"
+    done
+done
