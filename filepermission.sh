@@ -54,3 +54,85 @@
 # - `+r` alone doesn't remove existing write protections
 # - The command is safe to run (won't damage files)
 # - May not work if there are deeper permission restrictions
+
+
+
+# File Descriptors
+# File descriptors are integer handles that represent open files or data streams. Every process starts with three standard file descriptors:
+
+# 0 (stdin): Standard input
+# 1 (stdout): Standard output
+# 2 (stderr): Standard error
+
+
+# Redirect stdout to file
+echo "Hello World" > output.txt
+
+# Redirect stderr to file
+ls /nonexistent 2> error.log
+
+# Redirect both stdout and stderr
+command > output.txt 2>&1
+# or using newer syntax
+command &> output.txt
+
+# Redirect stderr to stdout
+command 2>&1
+
+# Discard output
+command > /dev/null 2>&1
+
+
+
+
+# Open file descriptor 3 for writing
+exec 3> logfile.txt
+
+# Write to file descriptor 3
+echo "Log entry 1" >&3
+echo "Log entry 2" >&3
+
+# Close file descriptor 3
+exec 3>&-
+
+
+# Open file descriptor 4 for reading
+exec 4< logfile.txt
+
+# Read from file descriptor 4
+while read -u 4 line; do  # -u 4 tells read to get input from file descriptor 4 # -u is superior for complex file handling.
+    echo "Read: $line"
+done
+
+# Close file descriptor 4
+exec 4<&-
+
+
+# # Duplicate file descriptors
+# exec 3>&1    # Save stdout to fd 3
+# exec 1>log   # Redirect stdout to file
+
+# echo "This goes to log file"
+# echo "This also goes to log" >&1
+# echo "This goes to original stdout" >&3
+
+# exec 1>&3    # Restore stdout
+# exec 3>&-    # Close fd 3
+
+# Using file descriptors for input/output separation
+function process_data() {
+    local input_fd=3
+    local output_fd=4
+    
+    exec 3< "$1"    # Open input file
+    exec 4> "$2"    # Open output file
+    
+    while read -u $input_fd line; do
+        echo "Processed: $line" >&$output_fd
+    done
+    
+    exec 3<&-       # Close input fd
+    exec 4>&-       # Close output fd
+}
+
+
